@@ -1,33 +1,38 @@
 // ===============================
-// Nsikak Quiz App Logic
+// Nsikak Quiz App (FINAL VERSION)
 // ===============================
 
 // Quiz data (questions, options, answers)
 const quizData = [
     {
-        question: "What is JavaScript used for?",
-        options: ["Styling pages", "Making pages interactive", "Database", "Server only"],
+        question: "What is JavaScript mainly used for?",
+        options: ["Styling pages", "Making pages interactive", "Database design", "Operating system"],
         answer: "Making pages interactive"
     },
     {
-        question: "Which is an ES6 array method?",
-        options: [".push()", ".map()", ".style()", ".html()"],
+        question: "Which of these is an ES6 array method?",
+        options: [".push()", ".map()", ".print()", ".style()"],
         answer: ".map()"
     },
     {
-        question: "What is recursion?",
-        options: ["Loop inside CSS", "Function calling itself", "Database type", "HTML tag"],
+        question: "What best describes recursion?",
+        options: [
+            "A loop inside HTML",
+            "Function calling itself",
+            "A CSS property",
+            "A database system"
+        ],
         answer: "Function calling itself"
     },
     {
-        question: "Which keyword declares a variable?",
-        options: ["var/let/const", "print", "echo", "define"],
-        answer: "var/let/const"
+        question: "Which library is used in this project?",
+        options: ["React", "SweetAlert2", "Laravel", "Vue"],
+        answer: "SweetAlert2"
     },
     {
-        question: "Which library is used in this project?",
-        options: ["React", "SweetAlert2", "Django", "Laravel"],
-        answer: "SweetAlert2"
+        question: "Which keyword declares a constant in JavaScript?",
+        options: ["var", "let", "const", "define"],
+        answer: "const"
     }
 ];
 
@@ -42,35 +47,66 @@ let score = 0;
 // ===============================
 function showQuestion() {
 
-    let q = quizData[currentIndex];
+    let currentQuestion = quizData[currentIndex];
 
-    document.getElementById("question").innerText = q.question;
+    document.getElementById("question").innerText =
+        currentQuestion.question;
 
     // ES6 MAP METHOD (REQUIRED)
-    let optionsHTML = q.options.map(option => {
-        return `<div class="option" onclick="checkAnswer('${option}')">${option}</div>`;
+    let optionsHTML = currentQuestion.options.map(option => {
+        return `
+            <div class="option" onclick="checkAnswer('${option}')">
+                ${option}
+            </div>
+        `;
     }).join("");
 
     document.getElementById("options").innerHTML = optionsHTML;
 }
 
 // ===============================
-// CHECK ANSWER FUNCTION
+// CHECK ANSWER (WITH EXCEPTION HANDLING FIX)
 // ===============================
 function checkAnswer(selected) {
 
-    let correct = quizData[currentIndex].answer;
+    try {
+        let correctAnswer = quizData[currentIndex].answer;
 
-    if (selected === correct) {
-        score++;
+        // THROW ERROR IF INVALID INPUT
+        if (!selected) {
+            throw new Error("No answer selected");
+        }
 
-        // External library (SweetAlert2)
-        Swal.fire("Correct!", "Good job Nsikak 👍", "success");
-    } else {
-        Swal.fire("Wrong!", "Try again next time", "error");
+        if (selected === correctAnswer) {
+            score++;
+
+            // External library (SweetAlert2)
+            Swal.fire({
+                title: "Correct!",
+                text: "Well done Nsikak 👍",
+                icon: "success"
+            });
+
+        } else {
+            Swal.fire({
+                title: "Wrong!",
+                text: "Correct answer: " + correctAnswer,
+                icon: "error"
+            });
+        }
+
+        document.getElementById("score").innerText =
+            "Score: " + score;
+
+    } catch (error) {
+        console.log("Error caught:", error.message);
+
+        Swal.fire({
+            title: "Error",
+            text: "Something went wrong. Please try again.",
+            icon: "warning"
+        });
     }
-
-    document.getElementById("score").innerText = "Score: " + score;
 }
 
 // ===============================
@@ -78,6 +114,7 @@ function checkAnswer(selected) {
 // ===============================
 function loadQuestion(index) {
 
+    // Base condition (ends quiz)
     if (index >= quizData.length) {
         return showResult();
     }
@@ -86,28 +123,30 @@ function loadQuestion(index) {
     showQuestion();
 }
 
-// NEXT BUTTON TRIGGER
+// NEXT QUESTION BUTTON
 function nextQuestion() {
     loadQuestion(currentIndex + 1);
 }
 
 // ===============================
-// SHOW FINAL RESULT (REDUCE USED)
+// SHOW FINAL RESULT (ES6 REDUCE USED)
 // ===============================
 function showResult() {
 
     // ES6 REDUCE METHOD (REQUIRED)
-    let total = quizData.reduce((sum, item) => sum + 1, 0);
+    let totalQuestions = quizData.reduce((accumulator) => {
+        return accumulator + 1;
+    }, 0);
 
     document.getElementById("quiz").innerHTML = `
-        <h2>Quiz Completed!</h2>
-        <p>Your Score: ${score} / ${total}</p>
+        <h2>Quiz Completed 🎉</h2>
+        <p>Your Score: ${score} / ${totalQuestions}</p>
         <button onclick="restartQuiz()">Restart Quiz</button>
     `;
 }
 
 // ===============================
-// RESTART QUIZ (RECURSION LOGIC)
+// RESTART QUIZ (RECURSION RESET LOGIC)
 // ===============================
 function restartQuiz() {
     score = 0;
@@ -115,5 +154,7 @@ function restartQuiz() {
     showQuestion();
 }
 
+// ===============================
 // START QUIZ
+// ===============================
 showQuestion();
